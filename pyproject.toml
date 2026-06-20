@@ -9,7 +9,14 @@ readme = "README.md"
 requires-python = "^3.10"
 dependencies = [
     "cyberwave (==0.4.9)",
-    "pyroboplan (>=1.3.1,<2.0.0)"
+    "pyroboplan (>=1.3.1,<2.0.0)",
+    "pyrealsense2 (>=2.58.2.10647,<3.0.0.0)",
+    "cyberwave-video-sync (>=0.1.0,<0.2.0)",
+    "opencv-python (>=4.13.0.92,<5.0.0.0)",
+    "pillow (>=12.2.0,<13.0.0)",
+    "ultralytics (>=8.4.72,<9.0.0)",
+    "matplotlib (>=3.7,<3.11)",
+    "open3d (>=0.19.0,<0.20.0)"
 ]
 
 [tool.poetry]
