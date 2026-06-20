@@ -8,7 +8,7 @@ authors = [
 readme = "README.md"
 requires-python = "^3.10"
 dependencies = [
-    "cyberwave (>=0.5.1,<0.6.0)"
+    "cyberwave[camera] (>=0.5.1,<0.6.0)"
 ]
 
 [tool.poetry]
