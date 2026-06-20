@@ -20,9 +20,6 @@ def get_pinocchio_moder():
     # You should change here to set up your own URDF file or just pass it as an argument of this example.
     urdf_filename = pinocchio_model_dir + "/models/piper_description.urdf"
 
-    print(pinocchio_model_dir + "/piper_description.urdf")
-    print(urdf_filename)
-
     # Load the urdf model
     pinocchio_model = pinocchio.buildModelFromUrdf(urdf_filename)
 
@@ -38,6 +35,19 @@ def create_ikin_solver():
     )
 
     return ik
+
+
+def get_forward_kinemaics(joints):
+
+    # Compute starting pose via forward kinematics so the planner has a valid start→end segment.
+    _model = get_pinocchio_moder()
+    _data = _model.createData()
+    pinocchio.forwardKinematics(_model, _data, joints)
+    pinocchio.updateFramePlacements(_model, _data)
+    _frame_id = _model.getFrameId(PLANNING_TARGET_LINK)
+    tform_start = _data.oMf[_frame_id]
+
+    return tform_start
 
 
 def create_planner(ik_solver, tforms):
@@ -61,15 +71,16 @@ def create_planner(ik_solver, tforms):
 
 ik_solver = create_ikin_solver()
 
+dt = 0.05
+q_start = np.array([0, 0, 0, 0, 0, 0])
+tform_start = get_forward_kinemaics(q_start)
 
 tforms = [
-    pinocchio.SE3(np.eye(3), np.array([1.0, 1.0, 0.3])),
+    tform_start,
+    pinocchio.SE3(np.eye(3), np.array([0.6, 0.6, 0.3])),
 ]
 
 planner = create_planner(ik_solver, tforms)
-
-dt = 0.05
-q_start = [0, 0, 0, 0, 0, 0]
 success, t_vec, q_vec = planner.generate(q_start, dt)
 
 

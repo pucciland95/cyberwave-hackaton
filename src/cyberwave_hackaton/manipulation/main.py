@@ -102,34 +102,10 @@ def close_gripper(arm):
 cw = Cyberwave()
 arm = cw.twin("agile-x-robotics/piper")
 
-ik_solver = create_ikin_solver()
 
+pos1 = [0.0, 30.0, -75.0, 0.0, 0.0, 0.0]
+pos2 = [180.0, 30.0, -75.0, 0.0, 0.0, 0.0]
 
-tforms = [
-    pinocchio.SE3(np.eye(3), np.array([1.0, 1.0, 0.3])),
-]
+move_to(arm, pos1)
+move_to(arm, pos2)
 
-planner = create_planner(ik_solver, tforms)
-
-dt = 0.05
-q_start = arm.joints.get()
-success, t_vec, q_vec = planner.generate(q_start, dt)
-
-
-# pos1 = [0.0, 30.0, -75.0, 0.0, 0.0, 0.0]
-# pos2 = [180.0, 30.0, -75.0, 0.0, 0.0, 0.0]
-
-# move_to(arm, pos1)
-# move_to(arm, pos2)
-
-# if success:
-#     q_arr = np.array(q_vec)
-#     num_joints = q_arr.shape[1] if q_arr.ndim == 2 else 1
-#     for i in range(num_joints):
-#         plt.plot(t_vec, q_arr[:, i], label=f"joint{i + 1}")
-#     plt.xlabel("Time (s)")
-#     plt.ylabel("Joint position (rad)")
-#     plt.title("Joint trajectories")
-#     plt.legend()
-#     plt.tight_layout()
-#     plt.show()
