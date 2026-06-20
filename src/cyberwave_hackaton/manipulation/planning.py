@@ -72,26 +72,30 @@ def create_planner(ik_solver, tforms):
 ik_solver = create_ikin_solver()
 
 dt = 0.05
-q_start = np.array([0, 0, 0, 0, 0, 0])
+q_start = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 tform_start = get_forward_kinemaics(q_start)
+q_end = np.array([0.1, 0.1, -0.1, 0.1, 0.1, 0.1])
+tform_end = get_forward_kinemaics(q_end)
 
-tforms = [
-    tform_start,
-    pinocchio.SE3(np.eye(3), np.array([0.6, 0.6, 0.3])),
-]
+
+tforms = [tform_start, tform_end]
 
 planner = create_planner(ik_solver, tforms)
 success, t_vec, q_vec = planner.generate(q_start, dt)
 
+print(len(q_vec))
+print(q_vec)
 
-if success:
-    q_arr = np.array(q_vec)
-    num_joints = q_arr.shape[1] if q_arr.ndim == 2 else 1
-    for i in range(num_joints):
-        plt.plot(t_vec, q_arr[:, i], label=f"joint{i + 1}")
-    plt.xlabel("Time (s)")
-    plt.ylabel("Joint position (rad)")
-    plt.title("Joint trajectories")
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
+# if success:
+#     q_arr = np.array(q_vec)
+#     if q_arr.ndim == 2 and q_arr.shape[0] != len(t_vec):
+#         q_arr = q_arr.T
+#     num_joints = q_arr.shape[1] if q_arr.ndim == 2 else 1
+#     for i in range(num_joints):
+#         plt.plot(t_vec, q_arr[:, i], label=f"joint{i + 1}")
+#     plt.xlabel("Time (s)")
+#     plt.ylabel("Joint position (rad)")
+#     plt.title("Joint trajectories")
+#     plt.legend()
+#     plt.tight_layout()
+#     plt.show()

@@ -469,14 +469,14 @@ test-no-images = ["pytest", "pytest-cov", "pytest-rerunfailures", "pytest-xdist"
 
 [[package]]
 name = "cyberwave"
-version = "0.5.1"
+version = "0.4.9"
 description = "Python SDK for Cyberwave"
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "cyberwave-0.5.1-py3-none-any.whl", hash = "sha256:c4331b8bebbe817e6296f5a787c1e0b52babd16d003c51324751db727c9435a1"},
-    {file = "cyberwave-0.5.1.tar.gz", hash = "sha256:aabc1a6521d23b01f52976e64bb02437fb8b4b6c0cae90b0b2482b7f7dc2c5b2"},
+    {file = "cyberwave-0.4.9-py3-none-any.whl", hash = "sha256:01973592c43ca36a6b8d08f2a742cab60974b2ce05acea7104ba8fac1f66bfb8"},
+    {file = "cyberwave-0.4.9.tar.gz", hash = "sha256:0ef0bf3d4efdcc697755c7206847cd519c04e441c76313c860458f40582b1fb9"},
 ]
 
 [package.dependencies]
@@ -489,27 +489,20 @@ typing-extensions = ">=4.7.1,<5.0.0"
 urllib3 = ">=2.1.0,<3.0.0"
 
 [package.extras]
-barcode = ["zxing-cpp (==3.0.0)"]
 camera = ["aiortc (>=1.5.0,<2.0.0)", "av (>=16.0.1,<17.0.0)", "opencv-python (>=4.8.0,<5.0.0)"]
 data = ["eclipse-zenoh (>=1.0.0)"]
-fuzzy-match = ["rapidfuzz (>=3.0.0)"]
 image = ["pillow (>=10.0.0)"]
-microphone = ["aiortc (>=1.5.0,<2.0.0)", "av (>=16.0.1,<17.0.0)", "pyudev (>=0.24.3)", "sounddevice (>=0.5.2)"]
+microphone = ["aiortc (>=1.5.0,<2.0.0)", "av (>=16.0.1,<17.0.0)", "pyudev (>=0.24.3)", "silero-vad (>=6.0)", "sounddevice (>=0.5.2)", "torchaudio (>=2.0.0)"]
 ml = ["ultralytics (>=8.0.0)"]
-ml-all = ["faster-whisper (>=1.1.1)", "onnxruntime (>=1.16.0)", "opencv-python (>=4.8.0,<5.0.0)", "openwakeword (>=0.6.0)", "pywhispercpp (==1.4.1)", "rapidfuzz (>=3.0.0)", "silero-vad (>=6.0)", "tflite-runtime (>=2.14.0)", "torchaudio (>=2.0.0)", "ultralytics (>=8.0.0)", "zxing-cpp (==3.0.0)"]
-ml-all-audio = ["faster-whisper (>=1.1.1)", "onnxruntime (>=1.16.0)", "openwakeword (>=0.6.0)", "pywhispercpp (==1.4.1)", "rapidfuzz (>=3.0.0)", "silero-vad (>=6.0)", "torchaudio (>=2.0.0)"]
-ml-all-vision = ["onnxruntime (>=1.16.0)", "opencv-python (>=4.8.0,<5.0.0)", "tflite-runtime (>=2.14.0)", "ultralytics (>=8.0.0)"]
-ml-audio = ["silero-vad (>=6.0)"]
+ml-all = ["onnxruntime (>=1.16.0)", "opencv-python (>=4.8.0,<5.0.0)", "tflite-runtime (>=2.14.0)", "ultralytics (>=8.0.0)"]
 ml-onnx = ["onnxruntime (>=1.16.0)"]
 ml-opencv = ["opencv-python (>=4.8.0,<5.0.0)"]
 ml-stt = ["pywhispercpp (==1.4.1)"]
-ml-stt-faster = ["faster-whisper (>=1.1.1)"]
 ml-tflite = ["tflite-runtime (>=2.14.0)"]
-ml-wakeword = ["onnxruntime (>=1.16.0)", "openwakeword (>=0.6.0)"]
+ml-vad = ["silero-vad (>=6.0)", "torchaudio (>=2.0.0)"]
 onnx = ["onnxruntime (>=1.16.0)"]
 realsense = ["aiortc (>=1.5.0,<2.0.0)", "av (>=16.0.1,<17.0.0)", "opencv-python (>=4.8.0,<5.0.0)"]
 schedule = ["croniter (>=6.2.2)"]
-speaker = ["aiortc (>=1.5.0,<2.0.0)", "av (>=16.0.1,<17.0.0)", "pyudev (>=0.24.3)", "sounddevice (>=0.5.2)"]
 tflite = ["tflite-runtime (>=2.14.0)"]
 zenoh = ["eclipse-zenoh (>=1.0.0)"]
 
@@ -2156,4 +2149,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "939c2d9531ed9022040bf13c75e2f56cdb26c00ea71858af2531d50723eeac27"
+content-hash = "9440f18f9fe753409c45dc55e71034c2a1e09467e61e9e69627a674d68bbfa33"
