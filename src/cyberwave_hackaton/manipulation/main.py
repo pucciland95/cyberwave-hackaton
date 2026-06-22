@@ -15,6 +15,35 @@ import math
 
 PLANNING_TARGET_LINK = "gripper_base"
 
+cw = Cyberwave()
+arm = cw.twin("agile-x-robotics/piper")
+joint_names = arm.joints.list()
+
+_latest_joints: dict = {}
+_joints_event = threading.Event()
+
+
+def _on_joint_update(payload):
+    try:
+        data = json.loads(payload) if isinstance(payload, str) else payload
+        if "positions" in data:
+            _latest_joints.update(data["positions"])
+        elif "joint_name" in data and "joint_state" in data:
+            pos = data["joint_state"].get("position")
+            if pos is not None:
+                _latest_joints[data["joint_name"]] = pos
+        else:
+            for key, val in data.items():
+                if key in joint_names and isinstance(val, (int, float)):
+                    _latest_joints[key] = val
+        if _latest_joints:
+            _joints_event.set()
+    except Exception:
+        pass
+
+
+arm.subscribe_joints(_on_joint_update)
+
 
 def get_pinocchio_moder():
     # This path refers to Pinocchio source code but you can define your own directory here.
@@ -76,94 +105,85 @@ def move_to(arm, des: list, err_tol=5.0):
 
     joint_names = arm.joints.list()
 
-    joint_names.remove("joint7")
-    joint_names.remove("joint8")
+    hand_poses = get_robot_hand_feedback()
+
+    des = np.concatenate([des, np.degrees(hand_poses)])
 
     joints = {j_name: j_pos for j_name, j_pos in zip(joint_names, des)}
 
-    arm.joints.set(
-        joints,
-        degrees=True,
-    )
+    for j_name, j_pos in joints.items():
+        arm.joints.set(j_name, j_pos, degrees=True)
 
-    time.sleep(0.5)
 
-    # while True:
+def move_linear(tform_end):
 
-    #     all_joints = arm.joints.get()
-    #     current_deg = [all_joints[j] * 180.0 / math.pi for j in joint_names]
-    #     if all(abs(curr - des) <= err_tol for curr, des in zip(current_deg, des)):
-    #         print("Finished")
-    #         break
+    q_start = get_robot_feedback()
+    tform_start = get_forward_kinemaics(q_start)
 
-    #     print(f"desired: {des}")
-    #     print(f"current: {current_deg}")
+    tforms = [tform_start, tform_end]
 
-    #     time.sleep(0.5)
+    planner = create_planner(ik_solver, tforms)
+    dt = 0.05
+    success, t_vec, q_pos = planner.generate(q_start, dt)
+
+    if success:
+        for i in range(q_pos.shape[1]):
+            waypoint_deg = np.degrees(q_pos[:, i]).tolist()
+            move_to(arm, waypoint_deg)
+            time.sleep(dt)
 
 
 def open_gripper(arm):
-    arm.joints.set({"joint7": 3, "joint8": 3}, degrees=False)
+    for j_name, j_pos in [("joint7", 3), ("joint8", 3)]:
+        arm.joints.set(j_name, j_pos, degrees=False)
     time.sleep(1)
 
 
 def close_gripper(arm):
-    arm.joints.set({"joint7": 0, "joint8": 0}, degrees=False)
+    for j_name, j_pos in [("joint7", 0), ("joint8", 0)]:
+        arm.joints.set(j_name, j_pos, degrees=False)
+
     time.sleep(1)
 
 
 def get_robot_feedback():
     _joints_event.wait()
-    values = [_latest_joints[j] for j in _joint_names if j in _latest_joints]
+    values = [_latest_joints[j] for j in joint_names if j in _latest_joints]
     # drop the last two joints (gripper fingers, not used for FK)
     return np.array(values[:-2])
 
 
-cw = Cyberwave()
-arm = cw.twin("agile-x-robotics/piper")
-
-_joint_names = arm.joints.list()
-_latest_joints: dict = {}
-_joints_event = threading.Event()
-
-
-def _on_joint_update(payload):
-    try:
-        data = json.loads(payload) if isinstance(payload, str) else payload
-        if "positions" in data:
-            _latest_joints.update(data["positions"])
-        elif "joint_name" in data and "joint_state" in data:
-            pos = data["joint_state"].get("position")
-            if pos is not None:
-                _latest_joints[data["joint_name"]] = pos
-        else:
-            for key, val in data.items():
-                if key in _joint_names and isinstance(val, (int, float)):
-                    _latest_joints[key] = val
-        if _latest_joints:
-            _joints_event.set()
-    except Exception:
-        pass
-
-
-arm.subscribe_joints(_on_joint_update)
+def get_robot_hand_feedback():
+    _joints_event.wait()
+    values = [_latest_joints[j] for j in joint_names if j in _latest_joints]
+    return np.array(values[-2:])
 
 
 ik_solver = create_ikin_solver()
 
-dt = 0.05
-
 q_start = get_robot_feedback()
-tform_start = get_forward_kinemaics(q_start)
+home = get_forward_kinemaics(q_start)
+home.translation = np.array(
+    [0.26182917, 0.15082827, 0.20514901]
+)  # e.g. 10 cm up in world Z
 
-tform_end = get_forward_kinemaics(q_start)
-tform_end.translation += np.array([0.0, 0.0, 0.1])  # e.g. 10 cm up in world Z
+open_gripper(arm)
+move_linear(home)
 
-tforms = [tform_start, tform_end]
+pose1 = home
+pose1.translation += np.array([0.0, 0.0, -0.06])
+move_linear(pose1)
+close_gripper(arm)
+print("Closed!")
 
-planner = create_planner(ik_solver, tforms)
-success, t_vec, q_pos = planner.generate(q_start, dt)
 
-for i in range(q_pos.shape[1]):
-    waypoint_deg = np.degrees(q_pos[:, i]).tolist()
-    move_to(arm, waypoint_deg)
+pose2 = pose1
+pose2.translation += np.array([0.0, 0.0, 0.08])
+move_linear(pose2)
+
+
+pose3 = pose2
+pose3.translation += np.array([0.0, -0.19, 0.0])
+move_linear(pose2)
+
+open_gripper(arm)

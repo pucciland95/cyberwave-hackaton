@@ -58,6 +58,12 @@ def get_pinocchio_moder():
 
     return pinocchio_model
 
+def get_robot_feedback():
+    _joints_event.wait()
+    values = [_latest_joints[j] for j in joint_names if j in _latest_joints]
+    # drop the last two joints (gripper fingers, not used for FK)
+    return np.array(values[:-2])
+
 
 def get_forward_kinemaics(joints):
 
@@ -84,14 +90,16 @@ def move_to(arm, des: list, err_tol=5.0):
     for j_name, j_pos in joints.items():
         arm.joints.set(j_name, j_pos, degrees=True)
 
-    while True:
-        current_deg = [arm.joints.get(j) * 180.0 / math.pi for j in joint_names]
-        if all(abs(curr - des) <= err_tol for curr, des in zip(current_deg, des)):
-            print("Finished")
-            break
+    # while True:
 
-        print(f"desired: {des}")
-        print(f"current: {current_deg}")
+    #     feedback = get_robot_feedback()
+    #     current_deg = [float(j) * 180.0 / math.pi for j in feedback]
+
+    #     if all(abs(curr - des) <= err_tol for curr, des in zip(current_deg, des)):
+    #         print("Finished")
+    #         print(f"desired: {des}")
+    #         print(f"current: {current_deg}")
+    #         break
 
     #     time.sleep(0.5)
 

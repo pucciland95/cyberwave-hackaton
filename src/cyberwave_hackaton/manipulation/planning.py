@@ -1,10 +1,8 @@
-import time
 from pyroboplan.ik.differential_ik import DifferentialIk, DifferentialIkOptions
 import pinocchio
 from os.path import dirname, abspath, join
 
 import numpy as np
-import matplotlib.pyplot as plt
 from pyroboplan.planning.cartesian_planner import (
     CartesianPlanner,
     CartesianPlannerOptions,
